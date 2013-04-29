@@ -90,8 +90,8 @@ public class Facebook {
 	 * 
 	 * See authorize() below for @params.
 	 */
-	public void authorize(Activity activity, final DialogListener listener) {
-		authorize(activity, new String[] {}, DEFAULT_AUTH_ACTIVITY_CODE, listener);
+	public void authorize(Activity activity, final DialogListener listener,int theme) {
+		authorize(activity, new String[] {}, DEFAULT_AUTH_ACTIVITY_CODE, listener,theme);
 	}
 
 	/**
@@ -99,8 +99,8 @@ public class Facebook {
 	 * 
 	 * See authorize() below for @params.
 	 */
-	public void authorize(Activity activity, String[] permissions, final DialogListener listener) {
-		authorize(activity, permissions, DEFAULT_AUTH_ACTIVITY_CODE, listener);
+	public void authorize(Activity activity, String[] permissions, final DialogListener listener,int theme) {
+		authorize(activity, permissions, DEFAULT_AUTH_ACTIVITY_CODE, listener,theme);
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class Facebook {
 	 *            Callback interface for notifying the calling application when the authentication dialog has completed,
 	 *            failed, or been canceled.
 	 */
-	public void authorize(Activity activity, String[] permissions, int activityCode, final DialogListener listener) {
+	public void authorize(Activity activity, String[] permissions, int activityCode, final DialogListener listener,int theme) {
 
 		boolean singleSignOnStarted = false;
 
@@ -165,7 +165,7 @@ public class Facebook {
 		}
 		// Otherwise fall back to traditional dialog.
 		if (!singleSignOnStarted) {
-			startDialogAuth(activity, permissions);
+			startDialogAuth(activity, permissions,theme);
 		}
 	}
 
@@ -254,7 +254,7 @@ public class Facebook {
 	 *            A list of permissions required for this application. If you do not require any permissions, pass an
 	 *            empty String array.
 	 */
-	private void startDialogAuth(Activity activity, String[] permissions) {
+	private void startDialogAuth(Activity activity, String[] permissions,int theme) {
 		Bundle params = new Bundle();
 		if (permissions.length > 0) {
 			params.putString("scope", TextUtils.join(",", permissions));
@@ -289,7 +289,7 @@ public class Facebook {
 				Log.d("Facebook-authorize", "Login canceled");
 				mAuthDialogListener.onCancel();
 			}
-		});
+		},theme);
 	}
 
 	/**
@@ -302,7 +302,7 @@ public class Facebook {
 	 * For more information, see http://developer.android.com/reference/android/app/ Activity.html#onActivityResult(int,
 	 * int, android.content.Intent)
 	 */
-	public void authorizeCallback(int requestCode, int resultCode, Intent data) {
+	public void authorizeCallback(int requestCode, int resultCode, Intent data,int theme) {
 		if (requestCode == mAuthActivityCode) {
 
 			// Successfully redirected.
@@ -318,7 +318,7 @@ public class Facebook {
 				if (error != null) {
 					if (error.equals(SINGLE_SIGN_ON_DISABLED) || error.equals("AndroidAuthKillSwitchException")) {
 						Log.d("Facebook-authorize", "Hosted auth currently " + "disabled. Retrying dialog auth...");
-						startDialogAuth(mAuthActivity, mAuthPermissions);
+						startDialogAuth(mAuthActivity, mAuthPermissions,theme);
 					} else if (error.equals("access_denied") || error.equals("OAuthAccessDeniedException")) {
 						Log.d("Facebook-authorize", "Login canceled by user.");
 						mAuthDialogListener.onCancel();
@@ -498,8 +498,8 @@ public class Facebook {
 	 * @param listener
 	 *            Callback interface to notify the application when the dialog has completed.
 	 */
-	public void dialog(Context context, String action, DialogListener listener) {
-		dialog(context, action, new Bundle(), listener);
+	public void dialog(Context context, String action, DialogListener listener,int theme) {
+		dialog(context, action, new Bundle(), listener,theme);
 	}
 
 	/**
@@ -517,7 +517,7 @@ public class Facebook {
 	 * @param listener
 	 *            Callback interface to notify the application when the dialog has completed.
 	 */
-	public void dialog(Context context, String action, Bundle parameters, final DialogListener listener) {
+	public void dialog(Context context, String action, Bundle parameters, final DialogListener listener,int theme) {
 
 		String endpoint = DIALOG_BASE_URL + action;
 		parameters.putString("display", "touch");
@@ -537,7 +537,7 @@ public class Facebook {
 		if (context.checkCallingOrSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
 			Util.showAlert(context, "Error", "Application requires permission to access the Internet");
 		} else {
-			new FbDialog(context, url, listener).show();
+			new FbDialog(context, url, listener,theme).show();
 		}
 	}
 

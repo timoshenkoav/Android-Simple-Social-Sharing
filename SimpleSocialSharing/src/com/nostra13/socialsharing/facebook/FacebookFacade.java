@@ -4,6 +4,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.nostra13.socialsharing.Constants;
+import com.nostra13.socialsharing.facebook.extpack.com.facebook.android.AsyncFacebookRunner;
+import com.nostra13.socialsharing.facebook.extpack.com.facebook.android.DialogError;
+import com.nostra13.socialsharing.facebook.extpack.com.facebook.android.Facebook;
+import com.nostra13.socialsharing.facebook.extpack.com.facebook.android.FacebookError;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,12 +16,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.nostra13.socialsharing.Constants;
 import com.nostra13.socialsharing.common.AuthListener;
-import com.nostra13.socialsharing.facebook.extpack.com.facebook.android.AsyncFacebookRunner;
-import com.nostra13.socialsharing.facebook.extpack.com.facebook.android.DialogError;
-import com.nostra13.socialsharing.facebook.extpack.com.facebook.android.Facebook;
-import com.nostra13.socialsharing.facebook.extpack.com.facebook.android.FacebookError;
 
 /**
  * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
@@ -26,8 +26,10 @@ public class FacebookFacade {
 	private static final String TAG = FacebookFacade.class.getSimpleName();
 
 	private Activity context;
+
 	private Facebook facebook;
 	private AsyncFacebookRunner asyncFacebook;
+
 
 	public FacebookFacade(Activity context, String facebookAppId) {
 		this.context = context;
@@ -40,11 +42,12 @@ public class FacebookFacade {
 		return facebook.isSessionValid();
 	}
 
-	public void authorize() {
-		authorize(null);
+	public void authorize(int theme) {
+		authorize(null,theme);
 	}
 
-	public void authorize(final AuthListener authListener) {
+	public void authorize(final AuthListener authListener,int theme) {
+
 		facebook.authorize(context, Constants.FACEBOOK_PERMISSIONS, Facebook.FORCE_DIALOG_AUTH, new FacebookAuthListener() {
 			@Override
 			public void onFacebookError(FacebookError e) {
@@ -64,7 +67,7 @@ public class FacebookFacade {
 				if (authListener != null) authListener.onAuthSucceed();
 				super.onComplete(values);
 			}
-		});
+		},theme);
 	}
 
 	public void logout() {
@@ -76,7 +79,9 @@ public class FacebookFacade {
 			}
 		});
 	}
-
+    public String getAccessToken(){
+        return facebook.getAccessToken();
+    }
 	public void publishMessage(String message) {
 		publishMessage(message, null, null, null);
 	}
